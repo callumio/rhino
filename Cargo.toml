@@ -1,0 +1,8 @@
+[package]
+name = "rhino"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+argh = "0.1.8"
+
