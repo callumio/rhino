@@ -10,4 +10,13 @@ pub struct RhinoArgs {
     /// invert the program - run if already running
     #[argh(switch, short = 'i')]
     pub invert: bool,
+
+    /// the command to be ran
+    #[argh(positional)]
+    pub cmd: String,
+
+    /// the options to be passed to the command to be ran
+    #[argh(positional)]
+    pub cmd_options: Vec<String>
+
 }
