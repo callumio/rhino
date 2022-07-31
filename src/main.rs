@@ -1,8 +1,8 @@
 mod args;
 mod ps;
 
-use ps::{search, run};
 use args::RhinoArgs;
+use ps::{run, search};
 
 fn main() {
     let args: RhinoArgs = argh::from_env();
@@ -11,8 +11,7 @@ fn main() {
 
     if !(args.invert ^ search(program_name)) {
         run(&args.cmd, &args.cmd_options);
-    }
-    else {
+    } else {
         println!("Search criteria was not met, exiting...");
     }
 }
