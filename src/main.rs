@@ -6,9 +6,11 @@ use args::RhinoArgs;
 
 fn main() {
     let args: RhinoArgs = argh::from_env();
-    let program_name: String = args.name.unwrap_or(args.cmd);
-    if !(args.invert ^ search(&program_name)) {
-        todo!("run the program");
+    // TODO remove unwrap once working
+    let program_name: &str = &args.name.unwrap_or_else(|| args.cmd.clone());
+
+    if !(args.invert ^ search(program_name)) {
+        run(&args.cmd, &args.cmd_options);
     }
     else {
         println!("Search criteria was not met, exiting...");
