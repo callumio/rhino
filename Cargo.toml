@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 argh = "0.1.8"
-
+procinfo = "0.4.2"
