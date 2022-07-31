@@ -2,9 +2,10 @@ use std::process::Command;
 use std::{i32, str, fs};
 use procinfo::pid::stat;
 
-pub fn run(cmd: &str, args: &str) {
-    let args_vec: Vec<&str> = args.split(' ').collect();
-    let run_cmd = Command::new(cmd).args(args_vec).spawn().expect("Error starting command");
+pub fn run(cmd: &str, args: &[String]) {
+    let buf: Vec<Vec<&str>> = args.iter().map(|x| x.split(' ').collect()).collect();
+    let args_vec = buf.concat();
+    //let run_cmd = Command::new(cmd).args(a).spawn().expect("Error starting command");
 }
 
 pub fn search(program: &str) -> bool {
