@@ -1,5 +1,6 @@
 use std::process::Command;
-use std::str;
+use std::{i32, str, fs};
+use procinfo::pid::stat;
 
 pub fn run(cmd: &str, args: &str) {
     let args_vec: Vec<&str> = args.split(' ').collect();
@@ -7,6 +8,16 @@ pub fn run(cmd: &str, args: &str) {
 }
 
 pub fn search(program: &str) -> bool {
-    let search_cmd = Command::new("pgrep").args(["-ix", program]).output().unwrap();
-    !matches!(search_cmd.stdout.as_slice(), b"")
+    for x in fs::read_dir("/proc/").unwrap() {
+        let file = x.unwrap().path();
+        if file.is_dir() {
+            // TODO remove unwrap after testing
+            let process_id: i32 = file.file_name().unwrap().to_string_lossy().parse::<i32>().unwrap_or(1);
+            if stat(process_id).unwrap_or_default().command == program {
+                return true;
+            }
+        };
+    };
+
+    false
 }
