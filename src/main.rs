@@ -11,6 +11,6 @@ fn main() {
         todo!("run the program");
     }
     else {
-        todo!("dont run program");
+        println!("Search criteria was not met, exiting...");
     }
 }
