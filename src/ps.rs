@@ -5,7 +5,7 @@ use std::{fs, i32, str};
 pub fn run(cmd: &str, args: &[String]) {
     let buf: Vec<Vec<&str>> = args.iter().map(|x| x.split(' ').collect()).collect();
     let args_vec = buf.concat();
-    //let run_cmd = Command::new(cmd).args(a).spawn().expect("Error starting command");
+    let run_cmd = Command::new(cmd).args(args_vec).spawn().expect("Error starting command");
 }
 
 pub fn search(program: &str) -> bool {
