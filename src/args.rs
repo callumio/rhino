@@ -4,7 +4,7 @@ use argh::FromArgs;
 /// todo
 pub struct RhinoArgs {
     /// invert the program - run if already running
-    #[argh(switch, short = 'i')]
+    #[argh(switch, short = 'i')] // implemented
     pub invert: bool,
 
     /// search for the process, case sensitively - by default it uses smart case
@@ -17,18 +17,18 @@ pub struct RhinoArgs {
 
     /// require all processes to match, to continue - by default at least one must be present
     #[argh(switch, short = 'a')]
-    pub all: bool,
+    pub all: bool, // implemented
 
     /// which program to check if it is running, delimited by a space - by default the command to
     /// be ran will be checked
     #[argh(option, short = 'n')]
-    pub name: Option<String>,
+    pub name: Option<String>, // implemented
 
     /// the command to be ran
     #[argh(positional)]
-    pub cmd: String,
+    pub cmd: String, // implemented
 
     /// the options to be passed to the command to be ran
     #[argh(positional)]
-    pub cmd_options: Vec<String>,
+    pub cmd_options: Vec<String>, // implemented
 }
