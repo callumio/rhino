@@ -9,7 +9,7 @@ use std::process::Command;
 use std::{fs, i32, str};
 
 pub fn run(cmd: &str, args: &[String]) {
-    let buf: Vec<Vec<&str>> = args.iter().map(|x| x.split(' ').collect()).collect();
+    let buf: Vec<Vec<&str>> = args.par_iter().map(|x| x.split(' ').collect()).collect();
     let args_vec = buf.concat();
     let run_cmd = Command::new(cmd)
         .args(args_vec)
@@ -34,7 +34,7 @@ pub fn search(program: &str, all: bool) -> Result<bool> {
 
     let all_reduce = |x: bool, xs: bool| x & xs;
     let any_reduce = |x: bool, xs: bool| x | xs;
-    let reduce_processes = match &all {
+    let reduce_processes = match all {
         true => all_reduce,
         false => any_reduce,
     };
