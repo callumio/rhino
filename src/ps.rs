@@ -1,29 +1,67 @@
+use anyhow::{bail, Result};
 use procinfo::pid::stat;
+use rayon::iter::ParallelBridge;
+use rayon::prelude::*;
+use std::fs::DirEntry;
+use std::io::Error;
+use std::path::PathBuf;
 use std::process::Command;
 use std::{fs, i32, str};
 
 pub fn run(cmd: &str, args: &[String]) {
     let buf: Vec<Vec<&str>> = args.iter().map(|x| x.split(' ').collect()).collect();
     let args_vec = buf.concat();
-    let run_cmd = Command::new(cmd).args(args_vec).spawn().expect("Error starting command");
+    let run_cmd = Command::new(cmd)
+        .args(args_vec)
+        .spawn()
+        .expect("Error starting command");
 }
 
-pub fn search(program: &str) -> bool {
-    for x in fs::read_dir("/proc/").unwrap() {
-        let file = x.unwrap().path();
-        if file.is_dir() {
-            // TODO remove unwrap after testing
-            let process_id: i32 = file
-                .file_name()
-                .unwrap()
-                .to_string_lossy()
-                .parse::<i32>()
-                .unwrap_or(1);
-            if stat(process_id).unwrap_or_default().command == program {
-                return true;
+pub fn search(program: &str, all: bool) -> Result<bool> {
+    let find = |x: Result<DirEntry, Error>| {
+        let path = match x.ok() {
+            Some(y) => y.path(),
+            None => return false,
+        };
+        match get_process_valid(path, program) {
+            Ok(r) => r,
+            Err(_) => false,
+        }
+    };
+
+    let processes = fs::read_dir("/proc/")?.par_bridge();
+    let processes_exist: Vec<bool> = processes.map(find).collect();
+
+    let all_reduce = |x: bool, xs: bool| x & xs;
+    let any_reduce = |x: bool, xs: bool| x | xs;
+    let reduce_processes = match &all {
+        true => all_reduce,
+        false => any_reduce,
+    };
+    Ok(processes_exist
+        .par_iter()
+        .cloned()
+        .reduce(|| all, reduce_processes))
+}
+
+pub fn get_process_valid(f: PathBuf, g: &str) -> Result<bool> {
+    if f.is_dir() {
+        let pid = match f
+            .file_name()
+            .and_then(|r| r.to_string_lossy().parse::<i32>().ok())
+        {
+            Some(p) => p,
+            None => {
+                bail!("Could not find pid for process")
             }
         };
+        let name: String = stat(pid)?.command;
+        if name == g {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    } else {
+        bail!("Process was not a folder");
     }
-
-    false
 }
