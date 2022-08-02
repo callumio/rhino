@@ -53,11 +53,7 @@ pub fn get_process_valid(f: PathBuf, g: &str) -> Result<bool> {
             }
         };
         let name: String = stat(pid)?.command;
-        if name == g {
-            Ok(true)
-        } else {
-            Ok(false)
-        }
+        Ok(name == g)
     } else {
         bail!("Process was not a folder");
     }
