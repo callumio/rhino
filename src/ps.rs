@@ -9,8 +9,11 @@ use std::process::Command;
 use std::{fs, i32, str};
 
 pub fn run(cmd: &str, args: &[String]) {
-    let buf: Vec<Vec<&str>> = args.par_iter().map(|x| x.split(' ').collect()).collect();
-    let args_vec = buf.concat();
+    let args_vec: Vec<&str> = args
+        .par_iter()
+        .map(|x| x.split(' ').collect())
+        .collect::<Vec<Vec<&str>>>()
+        .concat();
     let run_cmd = Command::new(cmd)
         .args(args_vec)
         .spawn()
