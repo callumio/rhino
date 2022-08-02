@@ -23,10 +23,7 @@ pub fn search(program: &str, all: bool) -> Result<bool> {
             Some(y) => y.path(),
             None => return false,
         };
-        match get_process_valid(path, program) {
-            Ok(r) => r,
-            Err(_) => false,
-        }
+        get_process_valid(path, program).unwrap_or(false)
     };
 
     let processes = fs::read_dir("/proc/")?.par_bridge();
