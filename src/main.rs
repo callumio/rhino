@@ -1,8 +1,6 @@
 mod args;
 mod ps;
 
-use std::process;
-
 use args::RhinoArgs;
 use ps::{run, search};
 
@@ -13,8 +11,7 @@ fn main() {
     let exists = match search(program_name, args.all) {
         Ok(r) => r,
         Err(e) => {
-            eprintln!("{}", e);
-            process::exit(1);
+            panic!("{}", e);
         }
     };
 
