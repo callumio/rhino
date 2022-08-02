@@ -18,27 +18,24 @@ pub fn run(cmd: &str, args: &[String]) {
 }
 
 pub fn search(program: &str, all: bool) -> Result<bool> {
-    let find = |x: Result<DirEntry, Error>| {
-        let path = match x.ok() {
-            Some(y) => y.path(),
-            None => return false,
-        };
-        get_process_valid(path, program).unwrap_or(false)
-    };
-
     let processes = fs::read_dir("/proc/")?.par_bridge();
-    let processes_exist: Vec<bool> = processes.map(find).collect();
+    let processes_exist: Vec<bool> = processes
+        .map(|x: Result<DirEntry, Error>| {
+            let path = match x.ok() {
+                Some(y) => y.path(),
+                None => return false,
+            };
+            get_process_valid(path, program).unwrap_or(false)
+        })
+        .collect();
 
-    let all_reduce = |x: bool, xs: bool| x & xs;
-    let any_reduce = |x: bool, xs: bool| x | xs;
-    let reduce_processes = match all {
-        true => all_reduce,
-        false => any_reduce,
-    };
-    Ok(processes_exist
-        .par_iter()
-        .cloned()
-        .reduce(|| all, reduce_processes))
+    Ok(processes_exist.par_iter().cloned().reduce(
+        || all,
+        |x: bool, xs: bool| match all {
+            true => x & xs,
+            false => x | xs,
+        },
+    ))
 }
 
 pub fn get_process_valid(f: PathBuf, g: &str) -> Result<bool> {
